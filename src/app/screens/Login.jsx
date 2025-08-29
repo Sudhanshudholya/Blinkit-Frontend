@@ -2,12 +2,14 @@ import React, { useState } from "react";
 import toast from "react-hot-toast";
 import { FiUser, FiMail, FiLock, FiEye, FiEyeOff } from "react-icons/fi";
 import { Link, useNavigate } from "react-router-dom";
-import { useRegisterMutation } from "../services/registerSlice";
 import { useLoginMutation } from "../services/loginSlice";
-
+import { useDispatch } from "react-redux";
+import { setUserDetails } from "../store/userSlice";
 const Login = () => {
   const navigate = useNavigate();
   const [login] = useLoginMutation();
+  const dispatch = useDispatch();
+
   const [data, setData] = useState({
     email: "",
     password: "",
@@ -43,11 +45,15 @@ const Login = () => {
 
       if (res) {
         toast.success("User Login successfully");
-        navigate("/");
+        dispatch(setUserDetails({ ...res.data, token: res.data.accessToken }));
+        localStorage.setItem("accessToken", res.data.accessToken);
+        localStorage.setItem("refreshToken", res.data.refreshToken);
+
         setData({
           email: "",
           password: "",
         });
+        navigate("/");
       } else {
         toast.error("Something went wrong to login user");
       }
@@ -55,7 +61,7 @@ const Login = () => {
       if (error?.data?.message) {
         toast.error(error.data.message); // ✅ This line shows backend error like "Email already exists"
       } else {
-        toast.error("Login failed. Please try again.");
+        toast.error("Login failed. Please try again later.");
       }
     } finally {
       setIsSubmitting(false);
@@ -105,9 +111,11 @@ const Login = () => {
                 {showPassword ? <FiEye /> : <FiEyeOff />}
               </div>
             </div>
-            <Link to={'/forgot-password'} className="block ml-auto text-blue-500 hover:text-sky-800">
-       Forgot Password
-             
+            <Link
+              to={"/forgot-password"}
+              className="block ml-auto text-blue-500 hover:text-sky-800"
+            >
+              Forgot Password
             </Link>
           </div>
 

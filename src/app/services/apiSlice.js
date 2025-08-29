@@ -5,9 +5,13 @@ export const apiSlice = createApi({
   baseQuery: fetchBaseQuery({
     baseUrl: "http://localhost:8080/api/v1/user/",
     credentials: "include",
-    prepareHeaders: (headers) => {
-      headers.set("Content-Type", "application/json"); // 🔄 "application-json" me typo tha
-      return headers; // ✅ RETURN headers
+    prepareHeaders: (headers, { getState }) => {
+      const token = localStorage.getItem('token').user.token; // Redux se token le raha
+      if (token) {
+        headers.set("Authorization", `Bearer ${token}`);
+      }
+      headers.set("Content-Type", "application/json");
+      return headers;
     },
   }),
   tagTypes: ["user"],
