@@ -1,14 +1,22 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import toast from "react-hot-toast";
 import { FiUser, FiMail, FiLock, FiEye, FiEyeOff } from "react-icons/fi";
 import { Link, useNavigate } from "react-router-dom";
 import { useLoginMutation } from "../services/loginSlice";
 import { useDispatch } from "react-redux";
+import { useGetUserDetailsQuery } from "../services/userDetailsSlice";
 import { setUserDetails } from "../store/userSlice";
+import { useRefreshTokenMutation } from "../services/refreshTokenSlice";
+
 const Login = () => {
   const navigate = useNavigate();
   const [login] = useLoginMutation();
   const dispatch = useDispatch();
+  // const { data: userData } = useGetUserDetailsQuery();
+  const token = localStorage.getItem("accessToken");
+  const { data: userData, refetch } = useGetUserDetailsQuery(undefined, {
+    skip: !token,
+  });
 
   const [data, setData] = useState({
     email: "",
@@ -34,35 +42,37 @@ const Login = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
     setIsSubmitting(true);
 
     try {
       const res = await login({
-        email: data.email,
-        password: data.password,
+        email: data?.email,
+        password: data?.password,
       }).unwrap();
 
       if (res) {
         toast.success("User Login successfully");
-        dispatch(setUserDetails({ ...res.data, token: res.data.accessToken }));
-        localStorage.setItem("accessToken", res.data.accessToken);
-        localStorage.setItem("refreshToken", res.data.refreshToken);
+        localStorage.setItem(
+          "accessToken",
+          res?.data?.accessToken || res?.accessToken
+        );
+        localStorage.setItem(
+          "refreshToken",
+          res?.data?.refreshToken || res?.refreshToken
+        );
 
-        setData({
-          email: "",
-          password: "",
-        });
-        navigate("/");
-      } else {
-        toast.error("Something went wrong to login user");
+        refetch()
       }
+      setData({
+        email: "",
+        password: "",
+      });
+      navigate("/");
     } catch (error) {
-      if (error?.data?.message) {
-        toast.error(error.data.message); // ✅ This line shows backend error like "Email already exists"
-      } else {
-        toast.error("Login failed. Please try again later.");
-      }
+      // All errors handled here, no success toast can reach here
+      toast.error(
+        error?.data?.message || "Login failed. Please try again later."
+      );
     } finally {
       setIsSubmitting(false);
     }
@@ -136,7 +146,7 @@ const Login = () => {
             to={"/register"}
             className="font-semibold text-green-700 hover:text-green-800"
           >
-            Login
+            Register
           </Link>
         </p>
       </div>

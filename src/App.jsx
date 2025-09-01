@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { use, useEffect } from "react";
 import { Outlet } from "react-router-dom";
 import Footer from "./app/components/Footer";
 import Header from "./app/components/Header";
@@ -9,29 +9,40 @@ import { useDispatch, useSelector } from "react-redux";
 
 const App = () => {
   const dispatch = useDispatch();
-  // const token = useSelector((state) => state?.user?.token);
-  const token = localStorage.getItem("token");
 
-  const { data, error, isSuccess, isLoading } = useGetUserDetailsQuery(undefined, {skip:!token});
+  const accessToken = localStorage.getItem("accessToken");
 
+  // const { data, isError, isSuccess, isLoading, error } = useGetUserDetailsQuery();
+
+  const {
+    data: userData,
+    error,
+    isSuccess,
+    isLoading,
+    isError,
+    refetch,
+  } = useGetUserDetailsQuery(undefined, { skip: !accessToken });
 
   useEffect(() => {
-    if (isSuccess && data) {
-      toast.success("User details fetched");
-      dispatch(setUserDetails(data?.data));
+    if (isSuccess && userData) {
+      dispatch(setUserDetails(userData?.data));
     }
 
     if (error) {
       toast.error("Failed to fetch user details");
     }
-  }, [isSuccess, data, error]);
+  }, [isSuccess, userData, error, dispatch]);
 
-  if (isLoading) return <div>Loading...</div>;
+  if (isLoading) return <div>Loading user details...</div>;
+  if (isError)
+    return (
+      <div>
+        Error: {error?.userData?.message || error?.error || "Unknown error"}
+      </div>
+    );
 
-  if (error) {
-    const errorMsg = error?.data?.message || error?.error || "Unknown error";
-    return <div>Error: {errorMsg}</div>;
-  }
+  console.log("Access-Token bhej rahe Hain:", accessToken);
+  console.log("User Details App Data:", userData);
 
   return (
     <>

@@ -4,7 +4,7 @@ export const otpVerificationSlice = apiSlice.injectEndpoints({
     endpoints: (builder) => ({
          otpVerification : builder.mutation({
            query:(value) => ({
-            url: "verify-forgot-password-otp",
+            url: "user/verify-forgot-password-otp",
             method: "PUT",
             body: value
            }),

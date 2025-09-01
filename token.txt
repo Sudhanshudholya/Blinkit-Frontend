@@ -1,0 +1,104 @@
+`import jwt_decode from "jwt-decode";
+import { useNavigate } from "react-router-dom";
+
+
+const App = () => {
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+  const accessToken = localStorage.getItem("accessToken");
+
+  let isTokenExpired = false;
+
+  if (accessToken) {
+    try {
+      const decoded = jwt_decode(accessToken);
+      const currentTime = Date.now() / 1000; // in seconds
+      if (decoded.exp < currentTime) {
+        isTokenExpired = true;
+        localStorage.removeItem("accessToken");
+        toast.error("Session expired. Please login again.");
+        navigate("/login");
+      }
+    } catch (err) {
+      console.error("Invalid token", err);
+      localStorage.removeItem("accessToken");
+    }
+  }
+
+  const {
+    data: userData,
+    error,
+    isSuccess,
+    isLoading,
+    isError,
+  } = useGetUserDetailsQuery(undefined, { skip: !accessToken || isTokenExpired });
+
+  useEffect(() => {
+    if (isSuccess && userData) {
+      dispatch(setUserDetails(userData?.data));
+    }
+
+    if (error) {
+      console.error("API Error:", error);
+      if (error?.data?.message === "jwt expired") {
+        toast.error("Session expired. Please login again.");
+        localStorage.removeItem("accessToken");
+        navigate("/login");
+      } else {
+        toast.error("Failed to fetch user details");
+      }
+    }
+  }, [isSuccess, userData, error]);
+
+  if (isLoading) return <div>Loading...</div>;
+  if (isError) return <div>Error: {error?.message || "Unknown error"}</div>;
+
+  return (
+    <>
+      <Header />
+      <main className="min-h-[78vh]">
+        <Outlet />
+      </main>
+      <Footer />
+      <Toaster />
+    </>
+  );
+};
+`
+
+
+
+const handleUploadCategoryImage = async (e) => {
+  const file = e.target.files[0];
+
+  if (!file) return;
+
+  // Optional: Validate file type and size here
+  if (!file.type.startsWith("image/")) {
+    toast.error("Please upload a valid image file");
+    return;
+  }
+  if (file.size > 5 * 1024 * 1024) { // 5MB limit example
+    toast.error("Image size should be less than 5MB");
+    return;
+  }
+
+  const formData = new FormData();
+  formData.append("image", file);
+
+  try {
+    const res = await uploadCategoryImage(formData).unwrap();
+    console.log("Response from upload:", res);
+
+    if (res) {
+      toast.success("Image Uploaded Successfully");
+      setData((prev) => ({
+        ...prev,
+        image: res?.data?.url || res?.url || "",
+      }));
+    }
+  } catch (error) {
+    console.error("Upload-category-image-error", error);
+    toast.error("Image upload failed");
+  }
+};

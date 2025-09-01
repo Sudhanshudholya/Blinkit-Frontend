@@ -6,7 +6,7 @@ const initialValue = {
   email: "",
   avatar: "",
   mobile: "",
-  token: "",
+  // token: "",
   verify_email: "",
   last_login_date: "",
   status: "",
@@ -28,7 +28,7 @@ export const userSlice = createSlice({
       state.email = action.payload?.email;
       state.avatar = action.payload?.avatar;
       state.mobile = action.payload?.mobile;
-      state.token = action.payload?.token || "";
+      // state.token = action.payload?.token || "";
       state.verify_email = action.payload?.verify_email;
       state.last_login_date = action.payload?.last_login_date;
       state.status = action.payload?.status;
@@ -39,13 +39,16 @@ export const userSlice = createSlice({
       // state.forgot_password_expiry = action.payload?.forgot_password_expiry;
       state.role = action.payload?.role;
     },
+    updateAvatar: (state, action) => {
+      state.avatar = action.payload.avatar ;
+    },
     logout: (state, action) => {
       state._id = "";
       state.name = "";
       state.email = "";
       state.avatar = "";
       state.mobile = "";
-      state.token = ""
+      // state.token = ""
       state.verify_email = "";
       state.last_login_date = "";
       state.status = "";
@@ -59,6 +62,6 @@ export const userSlice = createSlice({
   },
 });
 
-export const { setUserDetails, logout } = userSlice.actions;
+export const { setUserDetails, logout, updateAvatar } = userSlice.actions;
 
 export default userSlice.reducer;

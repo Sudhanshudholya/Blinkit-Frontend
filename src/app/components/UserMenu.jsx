@@ -1,55 +1,124 @@
-import React from 'react'
-import { useDispatch, useSelector } from 'react-redux'
-import { Link } from 'react-router-dom'
-import Divider from './Divider'
-import { useLogoutMutation } from '../services/logOutSlice'
-import toast from 'react-hot-toast'
+import React from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { Link, useNavigate } from "react-router-dom";
+import Divider from "./Divider";
+import toast from "react-hot-toast";
+import { useLogoutMutation } from "../services/logOutSlice";
+import { logout } from "../store/userSlice";
+import { RiExternalLinkFill } from "react-icons/ri";
 
-const UserMenu = () => {
-  const user = useSelector((state) => state?.user)
-  const [logout] = useLogoutMutation()
-  const dispatch = useDispatch()
+const UserMenu = ({ close }) => {
+  const user = useSelector((state) => state?.user);
+  const dispatch = useDispatch();
+  const [logoutUser] = useLogoutMutation();
+  const navigate = useNavigate();
 
   const handleLogOut = async () => {
-       try {
-        const res = await logout().unwrap()
-        if(res){
-          toast.success(res?.message || "User Logout successfully")
-          dispatch(logout())
-          localStorage.clear()
+    try {
+      const res = await logoutUser().unwrap();
+      if (res) {
+        if (close) {
+          close();
         }
-       } catch (error) {
-        toast.error(error || "Something went wron to logout user")
-       }
 
+        dispatch(logout());
+        localStorage.clear();
+        toast.success(res?.status || "User Logout successfully");
+        navigate("/");
+      }
+    } catch (error) {
+      toast.error(error || "Something went wrong to logout user");
+    }
+  };
 
-  }
+  const handleClose = () => {
+    if (close) {
+      close();
+    }
+  };
   return (
     <div>
-      <div className='font-bold'>
-        My account
+      <div className="font-bold">My account</div>
+      <div className="font-sans flex items-center gap-1">
+        <span className="max-w-52 text-ellipsis line-clamp-1">
+          {" "}
+          {user.name || user.mobile}{" "}
+        </span>
+        <Link
+          onClick={handleClose}
+          to={"/dashboard/profile"}
+          className="hover:text-blue-900"
+        >
+          <RiExternalLinkFill size={15} />
+        </Link>
       </div>
-      <div className='font-sans'>
-        {user.name || user.mobile}
-      </div>
 
-      <Divider/>
+      <Divider />
 
-      <div className='text-sm grid gap-2'>
+      <div className="text-sm grid gap-1">
 
-        <Link to={""} className='px-2'>
-        My Orders
+    
+
+      
+
+         <Link
+          onClick={handleClose}
+          to={"/dashboard/category"}
+          className="px-2 hover:bg-orange-300 py-1"
+        >
+          Category
         </Link>
 
-        <Link to={""}  className='px-2'>
-        Save Address
+         <Link
+          onClick={handleClose}
+          to={"/dashboard/sub-category"}
+          className="px-2 hover:bg-orange-300 py-1"
+        >
+          Sub-Category
         </Link>
 
-        <button onClick={handleLogOut} className='text-left px-2'>LogOut</button>
+           <Link
+          onClick={handleClose}
+          to={"/dashboard/upload-products"}
+          className="px-2 hover:bg-orange-300 py-1"
+        >
+          Upload Product
+        </Link>
+
+         <Link
+          onClick={handleClose}
+          to={"/dashboard/products"}
+          className="px-2 hover:bg-orange-300 py-1"
+        >
+          Products
+        </Link>
+
+
+        <Link
+          onClick={handleClose}
+          to={"/dashboard/my-orders"}
+          className="px-2 hover:bg-orange-300 py-1"
+        >
+          My Orders
+        </Link>
+
+        <Link
+          onClick={handleClose}
+          to={"/dashboard/address"}
+          className="px-2 hover:bg-orange-300 py-1"
+        >
+          Save Address
+        </Link>
+
+        <button
+          onClick={handleLogOut}
+          className="text-left px-2 cursor-pointer hover:bg-orange-300 py-1"
+        >
+          Logout
+        </button>
       </div>
     </div>
-  )
-}
+  );
+};
 
-export default UserMenu
-
+export default UserMenu;
