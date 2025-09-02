@@ -34,7 +34,7 @@ const UserProfileAvatarEdit = ({close}) => {
       if (res) {
         toast.success("Avatar upload successfully");
         dispatch(updateAvatar(res?.data?.avatar));
-        
+        close()
       }
     } catch (error) {
       console.log("Upload-avatar-error-put", error);

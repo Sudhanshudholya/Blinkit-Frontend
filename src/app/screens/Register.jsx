@@ -163,7 +163,7 @@ const Register = () => {
             disabled={!validate || isSubmitting}
             className={`${
               validate ? "bg-green-800 hover:bg-green-700" : "bg-gray-500"
-            } text-white py-2 rounded font-semibold my-3 tracking-wide`}
+            } text-white py-2 rounded font-semibold my-3 tracking-wide cursor-pointer`}
           >
             Register
           </button>

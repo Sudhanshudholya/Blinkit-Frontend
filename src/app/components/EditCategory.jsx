@@ -1,15 +1,19 @@
 import React, { useState } from "react";
 import { IoClose } from "react-icons/io5";
+import { useUpdateCategoryMutation } from "../services/updateCategorySlice";
 import toast from "react-hot-toast";
 import { useUploadCategoryImageMutation } from "../services/uploadCategoryImageSlice";
-import { useAddCategoryMutation } from "../services/addCategorySlice";
 
-const UploadCategoryModel = ({ close }) => {
-  const [data, setData] = useState({ name: "", image: "" });
-  const [uploadCategoryImage] = useUploadCategoryImageMutation();
-  const [addCategory] = useAddCategoryMutation();
+const EditCategory = ({ data: categoryData, close }) => {
+  const [data, setData] = useState({
+    _id: categoryData?._id,
+    name: categoryData?.name,
+    image: categoryData?.image,
+  });
   const [loading, setLoading] = useState(false);
   const [imageLoading, setImageLoading] = useState(false);
+  const [uploadCategoryImage] = useUploadCategoryImageMutation();
+  const [updateCategory] = useUpdateCategoryMutation();
 
   const handleOnchange = (e) => {
     const { name, value } = e.target;
@@ -18,24 +22,24 @@ const UploadCategoryModel = ({ close }) => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!data.name || !data.image) {
-      return;
-    }
+    if (!data._id || !data.name || !data.image) return;
 
     try {
       setLoading(true);
-       await new Promise((resolve) => setTimeout(resolve, 3000));
-      const res = await addCategory({
-        name: data.name,
-        image: data.image,
+      // 👇 Add artificial delay of 3000ms
+      await new Promise((resolve) => setTimeout(resolve, 3000));
+      const res = await updateCategory({
+        _id: data._id,
+        name: data?.name,
+        image: data?.image,
       }).unwrap();
       if (res) {
-        toast.success("Category added successfully");
+        toast.success("Category updated successfully");
         close();
       }
     } catch (error) {
       console.log("CATEGORY-ERRRR", error);
-      toast.error("Failed to add category");
+      toast.error("Failed to update category");
     } finally {
       setLoading(false);
     }
@@ -76,7 +80,7 @@ const UploadCategoryModel = ({ close }) => {
         </button>
 
         <h2 className="text-xl font-semibold mb-4 text-center">
-          Add New Category
+          Edit Category
         </h2>
 
         <form className="space-y-4" onSubmit={handleSubmit}>
@@ -114,16 +118,10 @@ const UploadCategoryModel = ({ close }) => {
               </div>
 
               <label className="cursor-pointer inline-block px-4 py-2 bg-blue-500 text-white text-sm font-medium rounded hover:bg-blue-600 transition">
-                {/* {imageLoading ? "Uploading..." : "Uploaded"} */}
-                {imageLoading
-                  ? "Uploading..."
-                  : data.image
-                  ? "Change Image"
-                  : "Upload Image"}
-
+                {imageLoading ? "Uploading..." : "Uploaded"}
                 <input
                   type="file"
-                  disabled={!data.name}
+                  //   disabled={!data.name}
                   onChange={handleUploadCategoryImage}
                   className="hidden"
                 />
@@ -141,7 +139,7 @@ const UploadCategoryModel = ({ close }) => {
                 : "bg-blue-600 hover:bg-blue-700 text-white"
             }`}
           >
-            {loading ? "Adding..." : "Add Category"}
+            {loading ? "Updating..." : "Update Category"}
           </button>
         </form>
       </div>
@@ -149,4 +147,4 @@ const UploadCategoryModel = ({ close }) => {
   );
 };
 
-export default UploadCategoryModel;
+export default EditCategory;

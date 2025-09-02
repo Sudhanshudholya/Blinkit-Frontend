@@ -61,18 +61,20 @@ const Login = () => {
           res?.data?.refreshToken || res?.refreshToken
         );
 
-        refetch()
+        setData({
+          email: "",
+          password: "",
+        });
+
+        navigate("/");
+        refetch();
       }
-      setData({
-        email: "",
-        password: "",
-      });
-      navigate("/");
     } catch (error) {
       // All errors handled here, no success toast can reach here
-      toast.error(
-        error?.data?.message || "Login failed. Please try again later."
-      );
+      // toast.error(
+      //   error?.data?.message || "Login failed. Please try again later."
+      // );
+      toast.error(error?.data?.message || "Login failed. Please try again later.")
     } finally {
       setIsSubmitting(false);
     }
