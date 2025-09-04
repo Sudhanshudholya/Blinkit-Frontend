@@ -16,7 +16,6 @@ const Header = () => {
   const user = useSelector((state) => state?.user);
   const [openUserMenu, setOpenUserMenu] = useState(false);
 
-  console.log("User-Details-From-Headers", user);
 
   const isSearchPage = location.pathname == "/search";
 

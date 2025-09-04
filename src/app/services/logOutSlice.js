@@ -3,10 +3,10 @@ import { apiSlice } from "./apiSlice";
 export const logoutSlice = apiSlice.injectEndpoints({
   endpoints: (builder) => ({
     logout: builder.mutation({
-      query: (value) => ({
+      query: () => ({
         url: "user/logout",
         method: "POST",
-        body: value,
+        headers : {Authorization: `Bearer ${localStorage.getItem("accessToken")}`}
       }),
       invalidatesTags: ["user"],
     }),

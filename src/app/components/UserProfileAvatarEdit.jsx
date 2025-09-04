@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { FaRegUser } from "react-icons/fa";
 import { useDispatch, useSelector } from "react-redux";
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { useUserAvatarUploadMutation } from "../services/userAvatarSlice";
 import toast from "react-hot-toast";
 import { updateAvatar } from "../store/userSlice";
@@ -10,7 +10,6 @@ import { IoClose } from "react-icons/io5";
 const UserProfileAvatarEdit = ({close}) => {
   const user = useSelector((state) => state?.user);
   const dispatch = useDispatch()
-  const navigate = useNavigate()
   const [loading, setLoading] = useState(false);
   const [userAvatarUpload] = useUserAvatarUploadMutation();
 
@@ -45,33 +44,43 @@ const UserProfileAvatarEdit = ({close}) => {
   };
 
   return (
-    <section className="fixed top-0 bottom-0 left-0 right-0 bg-neutral-900 opacity-60 p-4 flex items-center justify-center">
-      <div className="bg-white max-w-sm w-full rounded p-4 flex flex-col items-center justify-center">
-        <button onClick={close} className=" text-gray-700 hover:text-red-700 w-fit block ml-auto cursor-pointer">
-          <IoClose size={27}/>
-        </button>
-        <div className="w-20 h-20 bg-red-500 flex items-center justify-center rounded-full overflow-hidden drop-shadow-sm">
-          {user.avatar ? (
-            <img src={user.avatar} alt={user.name} className="w-full h-full" />
-          ) : (
-            <FaRegUser size={65} />
-          )}
-        </div>
-        <form onSubmit={handleSubmit}>
-          <label htmlFor="uploadProfile">
-            <div className="border cursor-pointer px-4 py-1 rounded text-sm my-3 border-blue-950 hover:border-red-900 hover:bg-green-400 hover:text-white">
-              {loading ? "Uploading ..." : "Upload"}
-            </div>
-          </label>
-          <input
-            type="file"
-            id="uploadProfile"
-            className="cursor-pointer hidden"
-            onChange={handleUploadAvatarImage}
-          />
-        </form>
-      </div>
-    </section>
+    
+
+    <section className="fixed inset-0 bg-gradient-to-br  from-neutral-400 via-neutral-500 to-neutral-600 bg-opacity-90 backdrop-blur-sm p-6 flex items-center justify-center z-50">
+  <div className="max-w-sm w-full bg-white rounded-xl p-6 flex flex-col items-center shadow-lg relative">
+    
+    <button
+      onClick={close}
+      className="absolute top-4 right-4 cursor-pointer text-gray-500 hover:text-red-600 transition-colors"
+      aria-label="Close modal"
+    >
+      <IoClose size={28} />
+    </button>
+    
+    <div className="w-24 h-24 bg-red-500 rounded-full overflow-hidden flex items-center justify-center shadow-md border-4 border-white mb-6">
+      {user.avatar ? (
+        <img src={user.avatar} alt={user.name} className="w-full h-full object-cover" />
+      ) : (
+        <FaRegUser size={72} className="text-white" />
+      )}
+    </div>
+
+    <form onSubmit={handleSubmit} className="w-full">
+      <label
+        htmlFor="uploadProfile"
+        className="block w-full cursor-pointer text-center bg-gradient-to-r from-green-400 to-blue-500 text-white font-semibold py-2 rounded-lg shadow hover:from-green-500 hover:to-blue-600 transition-colors"
+      >
+        {loading ? "Uploading ..." : "Upload"}
+      </label>
+      <input
+        type="file"
+        id="uploadProfile"
+        className="hidden"
+        onChange={handleUploadAvatarImage}
+      />
+    </form>
+  </div>
+</section>
   );
 };
 

@@ -4,9 +4,9 @@ import { Outlet } from "react-router-dom";
 import { useSelector } from "react-redux";
 
 const Dashboard = () => {
+  
   const user = useSelector(state => state?.user)
 
-  console.log("DASHBOARD-USER",  user)
   return (
     <section className="bg-white">
       <div className="container mx-auto p-3 grid lg:grid-cols-[250px_minmax(900px,_1fr)_100px] gap-4">

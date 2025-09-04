@@ -1,13 +1,13 @@
 import React, { useState } from "react";
 import { IoClose } from "react-icons/io5";
 import toast from "react-hot-toast";
-import { useUploadCategoryImageMutation } from "../services/uploadCategoryImageSlice";
 import { useAddCategoryMutation } from "../services/addCategorySlice";
+import { useUploadImageMutation } from "../services/uploadImageSlice";
 
 const UploadCategoryModel = ({ close }) => {
   const [data, setData] = useState({ name: "", image: "" });
-  const [uploadCategoryImage] = useUploadCategoryImageMutation();
-  const [addCategory] = useAddCategoryMutation();
+  const [uploadImage] = useUploadImageMutation()
+  const [addCategory] = useAddCategoryMutation()
   const [loading, setLoading] = useState(false);
   const [imageLoading, setImageLoading] = useState(false);
 
@@ -16,32 +16,46 @@ const UploadCategoryModel = ({ close }) => {
     setData((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    if (!data.name || !data.image) {
-      return;
-    }
 
-    try {
-      setLoading(true);
-       await new Promise((resolve) => setTimeout(resolve, 3000));
-      const res = await addCategory({
-        name: data.name,
-        image: data.image,
-      }).unwrap();
-      if (res) {
-        toast.success("Category added successfully");
-        close();
+const handleSubmit = async (e) => {
+  e.preventDefault();
+  if (!data.name || !data.image) return;
+
+  try {
+    setLoading(true);
+
+    // Optional delay
+    await new Promise((resolve) => setTimeout(resolve, 3000));
+
+    const res = await addCategory({
+      name: data.name,
+      image: data.image,
+    }).unwrap();
+
+    // ✅ Check res safely
+    if (res && res?.success) {
+      try {
+        close(); // Close modal first
+        toast.success(res?.message || "Category added successfully");
+      } catch (closeErr) {
+        console.warn("Modal close failed:", closeErr);
+        toast.success("Category added, but failed to close modal");
       }
-    } catch (error) {
-      console.log("CATEGORY-ERRRR", error);
-      toast.error("Failed to add category");
-    } finally {
-      setLoading(false);
+    } else {
+      toast.error(res?.message || "Category not added");
     }
-  };
+  } catch (error) {
+    console.error("Add Category Error:", error);
+    toast.error(
+      error?.data?.message || "Failed to add category, please try again."
+    );
+  } finally {
+    setLoading(false);
+  }
+};
 
-  const handleUploadCategoryImage = async (e) => {
+
+ const handleUploadCategoryImage = async (e) => {
     const file = e.target.files[0];
     if (!file) return;
 
@@ -50,7 +64,8 @@ const UploadCategoryModel = ({ close }) => {
 
     try {
       setImageLoading(true);
-      const res = await uploadCategoryImage(formData).unwrap();
+      const res = await uploadImage(formData).unwrap();
+      console.log("UPLOAD RESPONSE:", res);
       if (res) {
         toast.success("Image uploaded");
         setData((prev) => ({
@@ -65,6 +80,9 @@ const UploadCategoryModel = ({ close }) => {
     }
   };
 
+
+
+
   return (
     <section className="fixed inset-0 z-50 bg-black/50 flex items-center justify-center">
       <div className="bg-white w-full max-w-lg mx-4 p-6 rounded-xl shadow-xl relative backdrop-blur-md">
@@ -75,14 +93,14 @@ const UploadCategoryModel = ({ close }) => {
           <IoClose size={26} />
         </button>
 
-        <h2 className="text-xl font-semibold mb-4 text-center">
+        <h2 className="text-xl font-semibold  mb-4 text-center">
           Add New Category
         </h2>
 
         <form className="space-y-4" onSubmit={handleSubmit}>
           {/* Name input */}
           <div>
-            <label className="block mb-1 text-sm font-medium">
+            <label className="block mb-1 text-sm font-medium" htmlFor="name">
               Category Name
             </label>
             <input
@@ -123,7 +141,7 @@ const UploadCategoryModel = ({ close }) => {
 
                 <input
                   type="file"
-                  disabled={!data.name}
+                  // disabled={!data.name}
                   onChange={handleUploadCategoryImage}
                   className="hidden"
                 />

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import UploadCategoryModel from "../components/UploadCategoryModel";
 import { useGetCategoryQuery } from "../services/getCategorySlice";
 import Loading from "../components/Loading";
@@ -8,28 +8,20 @@ import EditCategory from "../components/EditCategory";
 import { useDeleteCategoryMutation } from "../services/deleteCategorySlice";
 import Swal from "sweetalert2";
 import SmallSpinner from "../components/SmallSpinner";
+import { useSelector } from "react-redux";
 
 const CategoryPage = () => {
+  
   const [openUploadCatgory, setOpenUplaoadCategory] = useState(false);
   const [openEdit, setOpenEdit] = useState(false);
-  const [editData, setEditData] = useState(false);
+  const [editData, setEditData] = useState(null);
   const [deleteId, setDeleteId] = useState(null);
   const [editId, setEditId] = useState(null);
-  const {
-    data: categoryData,
-    isLoading,
-    isError,
-    error,
-    refetch,
-  } = useGetCategoryQuery();
+  const {refetch} = useGetCategoryQuery();
+  const [deleteCategory] =useDeleteCategoryMutation();
+  const categories = useSelector(state => state?.product?.allCategory || [] )
 
-  const [deleteCategory, { isLoading: isDeleting }] =
-    useDeleteCategoryMutation();
-
-  const categories = categoryData?.data || [];
-
-  console.log("CATEGORY-PAGE-DATA-MAIN", categoryData);
-
+  
   const handleDelete = async (id) => {
     const result = await Swal.fire({
       title: "Are you sure?",
@@ -60,21 +52,6 @@ const CategoryPage = () => {
     }
   };
 
-  if (isLoading)
-    return (
-      <div className="flex justify-center items-center h-screen">
-        <Loading />
-      </div>
-    );
-
-  if (isError) {
-    return (
-      <div className="text-center text-red-500 mt-10">
-        {error?.categoryData?.message || error?.error || "Unknown error"}
-      </div>
-    );
-  }
-
   return (
     <section className="p-4 max-w-7xl mx-auto">
       {/* Header */}
@@ -82,7 +59,7 @@ const CategoryPage = () => {
         <h2 className="text-xl font-semibold text-gray-800">Category List</h2>
         <button
           onClick={() => setOpenUplaoadCategory(true)}
-          className="flex items-center gap-2 text-sm font-medium bg-green-600 text-white px-4 py-2 rounded-full hover:bg-green-700 transition"
+          className="flex cursor-pointer items-center gap-2 text-sm font-medium bg-green-600 text-white px-4 py-2 rounded-full hover:bg-green-700 transition"
         >
           Add Category
         </button>
@@ -156,7 +133,8 @@ const CategoryPage = () => {
         <UploadCategoryModel
           close={() => {
             setOpenUplaoadCategory(false);
-            refetch();
+            refetch()
+           
           }}
         />
       )}

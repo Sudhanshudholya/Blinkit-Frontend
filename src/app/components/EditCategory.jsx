@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { IoClose } from "react-icons/io5";
 import { useUpdateCategoryMutation } from "../services/updateCategorySlice";
 import toast from "react-hot-toast";
-import { useUploadCategoryImageMutation } from "../services/uploadCategoryImageSlice";
+import { useUploadImageMutation } from "../services/uploadImageSlice";
 
 const EditCategory = ({ data: categoryData, close }) => {
   const [data, setData] = useState({
@@ -12,7 +12,7 @@ const EditCategory = ({ data: categoryData, close }) => {
   });
   const [loading, setLoading] = useState(false);
   const [imageLoading, setImageLoading] = useState(false);
-  const [uploadCategoryImage] = useUploadCategoryImageMutation();
+  const [uploadImage] = useUploadImageMutation()
   const [updateCategory] = useUpdateCategoryMutation();
 
   const handleOnchange = (e) => {
@@ -54,7 +54,8 @@ const EditCategory = ({ data: categoryData, close }) => {
 
     try {
       setImageLoading(true);
-      const res = await uploadCategoryImage(formData).unwrap();
+      const res = await uploadImage(formData).unwrap();
+      console.log("UPLOAD RESPONSE:", res);
       if (res) {
         toast.success("Image uploaded");
         setData((prev) => ({
@@ -68,6 +69,8 @@ const EditCategory = ({ data: categoryData, close }) => {
       setImageLoading(false);
     }
   };
+
+
 
   return (
     <section className="fixed inset-0 z-50 bg-black/50 flex items-center justify-center">
@@ -121,7 +124,6 @@ const EditCategory = ({ data: categoryData, close }) => {
                 {imageLoading ? "Uploading..." : "Uploaded"}
                 <input
                   type="file"
-                  //   disabled={!data.name}
                   onChange={handleUploadCategoryImage}
                   className="hidden"
                 />

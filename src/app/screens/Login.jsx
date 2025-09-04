@@ -3,15 +3,11 @@ import toast from "react-hot-toast";
 import { FiUser, FiMail, FiLock, FiEye, FiEyeOff } from "react-icons/fi";
 import { Link, useNavigate } from "react-router-dom";
 import { useLoginMutation } from "../services/loginSlice";
-import { useDispatch } from "react-redux";
 import { useGetUserDetailsQuery } from "../services/userDetailsSlice";
-import { setUserDetails } from "../store/userSlice";
-import { useRefreshTokenMutation } from "../services/refreshTokenSlice";
 
 const Login = () => {
   const navigate = useNavigate();
   const [login] = useLoginMutation();
-  const dispatch = useDispatch();
   // const { data: userData } = useGetUserDetailsQuery();
   const token = localStorage.getItem("accessToken");
   const { data: userData, refetch } = useGetUserDetailsQuery(undefined, {
@@ -50,30 +46,15 @@ const Login = () => {
         password: data?.password,
       }).unwrap();
 
-      if (res) {
-        toast.success("User Login successfully");
-        localStorage.setItem(
-          "accessToken",
-          res?.data?.accessToken || res?.accessToken
-        );
-        localStorage.setItem(
-          "refreshToken",
-          res?.data?.refreshToken || res?.refreshToken
-        );
-
-        setData({
-          email: "",
-          password: "",
-        });
-
-        navigate("/");
-        refetch();
-      }
+    if (res) {
+      toast.success(res?.message || "Login successful");
+      localStorage.setItem("accessToken", res?.data?.accessToken);
+      localStorage.setItem("refreshToken", res?.data?.refreshToken);
+      setData({ email: "", password: "" });
+      navigate("/");
+    } 
     } catch (error) {
-      // All errors handled here, no success toast can reach here
-      // toast.error(
-      //   error?.data?.message || "Login failed. Please try again later."
-      // );
+      console.log("lgn", error)
       toast.error(error?.data?.message || "Login failed. Please try again later.")
     } finally {
       setIsSubmitting(false);

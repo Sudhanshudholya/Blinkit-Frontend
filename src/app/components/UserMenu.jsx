@@ -15,13 +15,16 @@ const UserMenu = ({ close }) => {
   const navigate = useNavigate();
 
   const handleLogOut = async () => {
+    const accessToken = localStorage.getItem("accessToken")
+
+    if(!accessToken){
+      toast.success("User already logged out")
+      return
+    }
     try {
       const res = await logoutUser().unwrap();
       if (res) {
-        if (close) {
-          close();
-        }
-
+        if (close) close();
         dispatch(logout());
         localStorage.clear();
         toast.success(res?.status || "User Logout successfully");

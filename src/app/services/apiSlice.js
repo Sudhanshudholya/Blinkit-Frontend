@@ -7,7 +7,6 @@ export const apiSlice = createApi({
     credentials: "include",
     prepareHeaders: (headers) => {
         const token = localStorage.getItem("accessToken");
-        console.log("Token bhej rahe hain:", token);
       if (token) {
         headers.set("Authorization", `Bearer ${token}`);
       }
@@ -15,6 +14,6 @@ export const apiSlice = createApi({
     },
     credentials: "include",
   }),
-  tagTypes: ["user", "category", "file"],
+  tagTypes: ["user", "category", "file", "sub-category"],
   endpoints: () => ({}),
 });

@@ -1,7 +1,7 @@
 import {apiSlice} from "./apiSlice"
-export const uploadCategoryImageSlice = apiSlice.injectEndpoints({
+export const uploadImageSlice = apiSlice.injectEndpoints({
     endpoints :(builder) => ({
-        uploadCategoryImage :builder.mutation({
+        uploadImage :builder.mutation({
             query: (formData) => ({
                 url: 'file/upload',
                 method: "POST",
@@ -12,4 +12,4 @@ export const uploadCategoryImageSlice = apiSlice.injectEndpoints({
     })
 })
 
-export const {useUploadCategoryImageMutation} = uploadCategoryImageSlice
+export const {useUploadImageMutation} = uploadImageSlice
